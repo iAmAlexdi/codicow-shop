@@ -6,8 +6,8 @@ import { Providers } from "@/components";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - alexWebCC | TiendaWeb",
-    default: "Inicio - alexWebCC | TiendaWeb",
+    template: "%s - alexWebCC | Shop",
+    default: "Home - alexWebCC | Shop",
   },
   description: "Tienda de demostracion de CodiCow",
 };
