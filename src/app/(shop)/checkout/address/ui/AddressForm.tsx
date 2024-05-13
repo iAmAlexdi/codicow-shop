@@ -1,16 +1,13 @@
 "use client";
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import clsx from 'clsx';
 
-
 import type { Address, Country } from '@/interfaces';
 import { useAddressStore } from '@/store';
 import { deleteUserAddress, setUserAddress } from '@/actions';
-
 
 type FormInputs = {
   firstName: string;
@@ -24,47 +21,34 @@ type FormInputs = {
   rememberAddress: boolean;
 }
 
-
 interface Props {
   countries: Country[];
   userStoredAddress?: Partial<Address>;
 }
 
-
 export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
-
   const router = useRouter();
-  const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
+  const { handleSubmit, register, formState: { isValid, errors }, reset } = useForm<FormInputs>({
     defaultValues: {
       ...(userStoredAddress as any),
       rememberAddress: false,
     }
   });
-
   const { data: session } = useSession({
     required: true,
-  })
-
+  });
   const setAddress = useAddressStore( state => state.setAddress );
   const address = useAddressStore( state => state.address );
-
-
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    if ( address.firstName ) {
-      reset(address)
+    if (address.firstName) {
+      reset(address);
     }
-  },[])
-  
-
-
-
+  },[]);
 
   const onSubmit = async( data: FormInputs ) => {
-    
-
     const { rememberAddress, ...restAddress } = data;
-
     setAddress(restAddress);
 
     if ( rememberAddress ) {
@@ -72,11 +56,8 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
     } else {
       await deleteUserAddress(session!.user.id);
     }
-
     router.push('/checkout');
-
   }
-
 
 
   return (
@@ -84,6 +65,7 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
       <div className="flex flex-col mb-2">
         <span>Nombres</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('firstName', { required: true  }) } />
+        {errors.firstName && <span className="text-red-500">* El nombre es obligatorio</span>}
       </div>
 
       <div className="flex flex-col mb-2">
@@ -172,7 +154,7 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
             'btn-disabled': !isValid,
           })}
         >
-          Siguiente
+          Continuar
         </button>
       </div>
     </form>
