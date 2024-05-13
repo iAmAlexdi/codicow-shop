@@ -14,6 +14,15 @@ export const registerUser = async (name: string, email: string, password: string
       };
     }
 
+    // Validar el correo electrónico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return {
+        ok: false,
+        message: 'El correo electrónico proporcionado no es válido, debe tener un dominio valido (ejemplo@gmail.com)',
+      };
+    }
+
     const user = await prisma.user.create({
       data: {
         name: name,

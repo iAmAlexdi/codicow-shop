@@ -79,7 +79,7 @@ export const RegisterForm = () => {
         { ...register('email', { required: true, pattern: /^\S+@\S+$/i }) }
       />
 
-      <label htmlFor="email">Contraseña</label>
+      <label htmlFor="email">Contraseña (Minimo 8 carcateres)</label>
       <input
         className={
           clsx(
@@ -90,7 +90,7 @@ export const RegisterForm = () => {
           )
         }
         type="password"
-        { ...register('password', { required: true, minLength: 6 }) }
+        { ...register('password', { required: true, minLength: 0 }) }
       />
 
       
