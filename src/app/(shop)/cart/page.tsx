@@ -28,7 +28,7 @@ export default function CartPage() {
 
           {/* Carrito */ }
           <div className="flex flex-col mt-5">
-            <span className="text-xl">Agregar más items</span>
+            <span className="text-xl">Agregar más unidades</span>
             <Link href="/" className="underline mb-5">
               Continúa comprando
             </Link>
@@ -53,7 +53,7 @@ export default function CartPage() {
               <Link 
                 className="flex btn-primary justify-center"
                 href="/checkout/address">
-                Checkout
+                Continuar compra
               </Link>
             </div>
 
