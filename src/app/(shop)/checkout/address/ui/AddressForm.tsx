@@ -13,7 +13,7 @@ type FormInputs = {
   firstName: string;
   lastName: string;
   address: string;
-  address2?: string;
+  address2: string;
   postalCode: string;
   city: string;
   country: string;
@@ -65,25 +65,25 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
       <div className="flex flex-col mb-2">
         <span>Nombres</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('firstName', { required: true  }) } />
-        {errors.firstName && <span className="text-red-500">* El nombre es un campo obligatorio</span>}
+        {errors.firstName && <span className="text-red-500">* Nombre requerido</span>}
       </div>
 
       <div className="flex flex-col mb-2">
         <span>Apellidos</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('lastName', { required: true  }) } />
-        {errors.lastName && <span className="text-red-500">* El apellido es un campo obligatorio</span>}
+        {errors.lastName && <span className="text-red-500">* Apellido requerido</span>}
       </div>
 
       <div className="flex flex-col mb-2">
         <span>Calle</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('address', { required: true  }) } />
-        {errors.address && <span className="text-red-500">* La calle es un campo obligatorio</span>}
+        {errors.address && <span className="text-red-500">* Calle requerida</span>}
       </div>
 
       <div className="flex flex-col mb-2">
         <span>Colonia</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('address2', { required: true  }) } />
-        {errors.address && <span className="text-red-500">* La colonia es un campo obligatorio</span>}
+        {errors.address2 && <span className="text-red-500">* Colonia requerida</span>}
       </div>
 
       <div className="flex flex-col mb-2">
