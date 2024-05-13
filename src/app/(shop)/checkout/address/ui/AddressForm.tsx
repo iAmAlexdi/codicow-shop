@@ -1,13 +1,16 @@
 "use client";
-import { useEffect, useState } from 'react';
+
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import clsx from 'clsx';
 
+
 import type { Address, Country } from '@/interfaces';
 import { useAddressStore } from '@/store';
 import { deleteUserAddress, setUserAddress } from '@/actions';
+
 
 type FormInputs = {
   firstName: string;
@@ -21,34 +24,47 @@ type FormInputs = {
   rememberAddress: boolean;
 }
 
+
 interface Props {
   countries: Country[];
   userStoredAddress?: Partial<Address>;
 }
 
+
 export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
+
   const router = useRouter();
-  const { handleSubmit, register, formState: { isValid, errors }, reset } = useForm<FormInputs>({
+  const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
     defaultValues: {
       ...(userStoredAddress as any),
       rememberAddress: false,
     }
   });
+
   const { data: session } = useSession({
     required: true,
-  });
+  })
+
   const setAddress = useAddressStore( state => state.setAddress );
   const address = useAddressStore( state => state.address );
-  const [formError, setFormError] = useState<string | null>(null);
+
+
 
   useEffect(() => {
-    if (address.firstName) {
-      reset(address);
+    if ( address.firstName ) {
+      reset(address)
     }
-  },[]);
+  },[])
+  
+
+
+
 
   const onSubmit = async( data: FormInputs ) => {
+    
+
     const { rememberAddress, ...restAddress } = data;
+
     setAddress(restAddress);
 
     if ( rememberAddress ) {
@@ -56,8 +72,11 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
     } else {
       await deleteUserAddress(session!.user.id);
     }
+
     router.push('/checkout');
+
   }
+
 
 
   return (
@@ -65,37 +84,31 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
       <div className="flex flex-col mb-2">
         <span>Nombres</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('firstName', { required: true  }) } />
-        {errors.firstName && <span className="text-red-500">* El nombre es un campo obligatorio</span>}
       </div>
 
       <div className="flex flex-col mb-2">
         <span>Apellidos</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('lastName', { required: true  }) } />
-        {errors.lastName && <span className="text-red-500">* El apellido es un campo obligatorio</span>}
       </div>
 
       <div className="flex flex-col mb-2">
-        <span>Calle</span>
+        <span>Dirección</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('address', { required: true  }) } />
-        {errors.address && <span className="text-red-500">* La calle es un campo obligatorio</span>}
       </div>
 
       <div className="flex flex-col mb-2">
-        <span>Colonia</span>
-        <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('address2', { required: true  }) } />
-        {errors.address2 && <span className="text-red-500">* La colonia es un campo obligatorio</span>}
+        <span>Dirección 2 (opcional)</span>
+        <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('address2') } />
       </div>
 
       <div className="flex flex-col mb-2">
         <span>Código postal</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('postalCode', { required: true  }) } />
-        {errors.postalCode && <span className="text-red-500">* Código postal requerido</span>}
       </div>
 
       <div className="flex flex-col mb-2">
-        <span>Municipio</span>
+        <span>Ciudad</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('city', { required: true  }) } />
-        {errors.city && <span className="text-red-500">* Municipio requerido</span>}
       </div>
 
       <div className="flex flex-col mb-2">
@@ -112,8 +125,7 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
 
       <div className="flex flex-col mb-2">
         <span>Teléfono</span>
-        <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('phone', { required: true, pattern: /^\+?[0-9]+$/ }) } />
-        {errors.phone && <span className="text-red-500">* El teléfono debe ser un número válido, puede iniciar con "+"</span>}
+        <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('phone', { required: true  }) } />
       </div>
 
       <div className="flex flex-col mb-2 sm:mt-1">
@@ -151,12 +163,16 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
         </div>
 
         <button
+          disabled={ !isValid }
+          // href="/checkout"
           type="submit"
-          className={ clsx('btn-primary', {
-            'btn-disabled': Object.keys(errors).length > 0,
+          // className="btn-primary flex w-full sm:w-1/2 justify-center "
+          className={ clsx({
+            'btn-primary': isValid,
+            'btn-disabled': !isValid,
           })}
         >
-          Continuar
+          Siguiente
         </button>
       </div>
     </form>
