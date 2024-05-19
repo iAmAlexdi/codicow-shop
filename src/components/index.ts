@@ -8,7 +8,7 @@ export * from './products/product-grid/ProductGridItem';
 export * from './orders/OrderStatus';
 
 
-export * from './paypal/PayPalButton'
+//export * from './paypal/PayPalButton'
 
 
 export * from './providers/Providers';
