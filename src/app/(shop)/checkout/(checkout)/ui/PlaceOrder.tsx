@@ -18,22 +18,6 @@ export const PlaceOrder = () => {
   const [orderId, setOrderId] = useState(null);
   const [showPayPalButtons, setShowPayPalButtons] = useState(false);
 
-  // Definir los tipos manualmente
-type OnApproveData = {
-  orderID: string;
-  payerID?: string;
-  paymentID?: string;
-  billingToken?: string;
-  facilitatorAccessToken: string;
-};
-
-type OnApproveActions = {
-  order: {
-    capture: () => Promise<any>;
-    authorize: () => Promise<any>;
-  };
-};
-
   const address = useAddressStore((state) => state.address);
 
   const { itemsInCart, subTotal, tax, total } = useCartStore((state) =>
@@ -47,7 +31,7 @@ type OnApproveActions = {
   }, []);
 
 
-  const handleApprove = async (data: OnApproveData, actions: OnApproveActions) => {
+  const handleApprove = async (data, actions) => {
 
     console.log("empezo bien")
 
@@ -82,7 +66,7 @@ type OnApproveActions = {
 
   };
 
-  const handleCancel = (data: OnApproveData) => {
+  const handleCancel = (data) => {
     console.log("Se cancelo");
     setIsPlacingOrder(true);
     setShowPayPalButtons(true);
@@ -163,7 +147,9 @@ type OnApproveActions = {
       </div>
 
       {showPayPalButtons && (
-        <PayPalScriptProvider>
+        <PayPalScriptProvider options={{
+          clientId:"Ab9NIe_DMyUmuLfbj4A0HyNe92Y081Cnm4uec9EHVNeJyir20aacWECDXwD72hvWv-DL24LtKv0CNdHE"
+        }}>
           <PayPalButtons
             style={{
               layout: "horizontal", 

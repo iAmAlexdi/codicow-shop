@@ -22,7 +22,7 @@ export async function POST() {
       {
         amount: {
           currency_code: "USD",
-          value: "8.50",
+          value: "11.99",
         },
         description: "Esta comprando en la tienda CodiCown"
       },
