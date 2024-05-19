@@ -159,6 +159,10 @@ export const PlaceOrder = () => {
                 headers: {
                   "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                  total,
+                  description: `${itemsInCart === 1 ? "1 artículo" : `${itemsInCart} artículos`}`
+                })
               });
               const order = await res.json();
               console.log(order);
