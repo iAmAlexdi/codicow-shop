@@ -116,6 +116,13 @@ export const placeOrder = async (
         },
       });
 
+      // Actualizar el estado de la orden a "pagada"
+    await tx.order.update({
+      where: { id: order.id },
+      data: { isPaid: true, paidAt: new Date() }
+      
+    });
+
       // Validar, si el price es cero, entonces, lanzar un error
 
       // 3. Crear la direccion de la orden

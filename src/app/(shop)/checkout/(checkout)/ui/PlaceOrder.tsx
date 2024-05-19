@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-import { placeOrder } from '@/actions';
+import { placeOrder} from '@/actions';
 import { useAddressStore, useCartStore } from "@/store";
 import { currencyFormat } from '@/utils';
 
@@ -14,6 +15,8 @@ export const PlaceOrder = () => {
   const [loaded, setLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [showPayPalButtons, setShowPayPalButtons] = useState(false);
 
 
 
@@ -22,42 +25,59 @@ export const PlaceOrder = () => {
   const { itemsInCart, subTotal, tax, total } = useCartStore((state) =>
     state.getSummaryInformation()
   );
-  const cart = useCartStore( state => state.cart );
-  const clearCart = useCartStore( state => state.clearCart );
+  const cart = useCartStore(state => state.cart);
+  const clearCart = useCartStore(state => state.clearCart);
 
   useEffect(() => {
     setLoaded(true);
   }, []);
 
 
-  const onPlaceOrder = async() => {
-    setIsPlacingOrder(true);
-    // await sleep(2);
+  const handleApprove = async (data, actions) => {
 
-    const productsToOrder = cart.map( product => ({
+    console.log("empezo bien")
+
+    await actions.order.capture();
+
+    const productsToOrder = cart.map(product => ({
       productId: product.id,
       quantity: product.quantity,
       size: product.size,
     }))
 
+    console.log("Ya se resto")
 
-    //! Server Action
-    const resp = await placeOrder( productsToOrder, address);
-    if ( !resp.ok ) {
-      setIsPlacingOrder(false);
+     //! Server Action
+    const resp = await placeOrder(productsToOrder, address);
+    if (!resp.ok) {
+
+      console.log("Ya dio ok")
+
       setErrorMessage(resp.message);
       return;
     }
-
+    
     //* Todo salio bien!
     clearCart();
-    router.replace('/orders/' + resp.order?.id );
+    router.replace('/orders/' + resp.order?.id )
 
+    setIsPlacingOrder(false);
+    setShowPayPalButtons(false);
 
-  }
+    console.log("Ya prendio tu");
 
+  };
 
+  const handleCancel = (data) => {
+    console.log("Se cancelo");
+    setIsPlacingOrder(true);
+    setShowPayPalButtons(true);
+  };
 
+  const handlePlaceOrderClick = () => {
+    setIsPlacingOrder(true);
+    setShowPayPalButtons(true);
+  };
 
   if (!loaded) {
     return <p>Cargando...</p>;
@@ -79,7 +99,6 @@ export const PlaceOrder = () => {
         <p>{address.phone}</p>
       </div>
 
-      {/* Divider */}
       <div className="w-full h-0.5 rounded bg-gray-200 mb-10" />
 
       <h2 className="text-2xl mb-2">Resumen de orden</h2>
@@ -104,7 +123,6 @@ export const PlaceOrder = () => {
 
       <div className="mt-5 mb-2 w-full">
         <p className="mb-5">
-          {/* Disclaimer */}
           <span className="text-xs">
             Al hacer clic en &quot;Colocar orden&quot;, aceptas nuestros{" "}
             <a href="#" className="underline">
@@ -117,22 +135,42 @@ export const PlaceOrder = () => {
           </span>
         </p>
 
-
-        <p className="text-red-500">{ errorMessage }</p>
+        <p className="text-red-500">{errorMessage}</p>
 
         <button
-          // href="/orders/123"
-          onClick={ onPlaceOrder }
-          className={
-            clsx({
-              'btn-primary': !isPlacingOrder,
-              'btn-disabled': isPlacingOrder
-            })
-          }
+          onClick={handlePlaceOrderClick}
+          className={clsx({
+            'btn-primary': !isPlacingOrder,
+            'btn-disabled': isPlacingOrder
+          })}
         >
           Colocar orden
         </button>
       </div>
+
+      {showPayPalButtons && (
+        <PayPalScriptProvider>
+          <PayPalButtons
+            style={{
+              layout: "horizontal", 
+              color: "silver" 
+            }}
+            createOrder={async (data, actions) => {
+              const res = await fetch('/api/checkout', {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              const order = await res.json();
+              console.log(order);
+              return order.id;
+            }}
+            onCancel={handleCancel}
+            onApprove={handleApprove}
+          />
+        </PayPalScriptProvider>
+      )}
     </div>
   );
 };
