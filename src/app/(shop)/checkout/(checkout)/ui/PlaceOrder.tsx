@@ -31,11 +31,9 @@ export const PlaceOrder = () => {
   }, []);
 
 
-  const handleApprove = async (data, actions) => {
+  const handleApprove = async () => {
 
     console.log("empezo bien")
-
-    await actions.order.capture();
 
     const productsToOrder = cart.map(product => ({
       productId: product.id,
@@ -66,7 +64,7 @@ export const PlaceOrder = () => {
 
   };
 
-  const handleCancel = (data) => {
+  const handleCancel = () => {
     console.log("Se cancelo");
     setIsPlacingOrder(true);
     setShowPayPalButtons(true);
@@ -166,8 +164,13 @@ export const PlaceOrder = () => {
               console.log(order);
               return order.id;
             }}
-            onCancel={handleCancel}
-            onApprove={handleApprove}
+            onCancel={ (data) => {
+              handleCancel();
+            }}
+            onApprove={async (data, actions) => {
+              await actions.order?.capture();
+              handleApprove();
+            }}
           />
         </PayPalScriptProvider>
       )}
