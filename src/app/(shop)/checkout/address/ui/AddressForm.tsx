@@ -75,7 +75,7 @@ export const AddressForm = ({ countries, userStoredAddress = {} }: Props) => {
       </div>
 
       <div className="flex flex-col mb-2">
-        <span>Calle</span>
+        <span>Calle y número</span>
         <input type="text" className="p-2 border rounded-md bg-gray-200" { ...register('address', { required: true  }) } />
         {errors.address && <span className="text-red-500">* Calle requerida</span>}
       </div>

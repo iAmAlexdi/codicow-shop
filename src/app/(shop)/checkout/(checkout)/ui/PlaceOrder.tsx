@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -47,16 +48,33 @@ export const PlaceOrder = () => {
     const resp = await placeOrder(productsToOrder, address);
     if (!resp.ok) {
 
-      console.log("Ya dio ok")
+      console.log("No dio ok")
 
       setErrorMessage(resp.message);
       return;
     }
+
+    //enviar email
+    const respM = await fetch('/api/send', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        firstName: address.firstName,
+        ordenID: resp.order?.id
+      }),
+    })
+    const dataM = await respM.json();
+    console.log(dataM);
+
+
+    console.log(resp.order?.id)
+    console.log(address.firstName)
     
     //* Todo salio bien!
     clearCart();
     router.replace('/orders/' + resp.order?.id )
-
     setIsPlacingOrder(false);
     setShowPayPalButtons(false);
 
@@ -70,7 +88,8 @@ export const PlaceOrder = () => {
     setShowPayPalButtons(true);
   };
 
-  const handlePlaceOrderClick = () => {
+  const handlePlaceOrderClick = async () => {
+
     setIsPlacingOrder(true);
     setShowPayPalButtons(true);
   };
