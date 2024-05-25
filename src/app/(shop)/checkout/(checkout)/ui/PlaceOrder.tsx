@@ -54,7 +54,16 @@ export const PlaceOrder = () => {
       return;
     }
 
-    //enviar email
+    console.log(resp.order?.id)
+    console.log(address.firstName)
+    
+    //* Todo salio bien!
+    clearCart();
+    router.replace('/orders/' + resp.order?.id )
+    setIsPlacingOrder(false);
+    setShowPayPalButtons(false);
+
+    //enviar email-----------------------------
     const respM = await fetch('/api/send', {
       method: "POST",
       headers: {
@@ -67,16 +76,8 @@ export const PlaceOrder = () => {
     })
     const dataM = await respM.json();
     console.log(dataM);
+    //-----------------------------------------
 
-
-    console.log(resp.order?.id)
-    console.log(address.firstName)
-    
-    //* Todo salio bien!
-    clearCart();
-    router.replace('/orders/' + resp.order?.id )
-    setIsPlacingOrder(false);
-    setShowPayPalButtons(false);
 
     console.log("Ya prendio tu");
 
