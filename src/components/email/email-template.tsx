@@ -59,7 +59,7 @@ interface EmailTemplateProps {
       <h4>Productos</h4>
       {order.items.map(item => (
         <div key={item.productTitle} style={{ marginBottom: '10px' }}>
-          <img src={`/products/${item.productImage}`} alt={item.productTitle} width={100} height={100} style={{ marginRight: '10px' }} />
+          <img src={`https://alexdy-pagina-web.vercel.app/_next/image?url=%2Fproducts%2F${item.productImage}&w=256&q=75`} alt={item.productTitle} width={100} height={100} style={{ marginRight: '10px' }} />
           <div>
             <p className="font-bold">{item.productTitle} x {item.quantity}</p>
           </div>
