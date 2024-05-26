@@ -9,6 +9,7 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { placeOrder} from '@/actions';
 import { useAddressStore, useCartStore } from "@/store";
 import { currencyFormat } from '@/utils';
+import { getOrderById } from "@/actions/order/get-order-by-id";
 
 export const PlaceOrder = () => {
 
@@ -16,7 +17,6 @@ export const PlaceOrder = () => {
   const [loaded, setLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [orderId, setOrderId] = useState(null);
   const [showPayPalButtons, setShowPayPalButtons] = useState(false);
 
   const address = useAddressStore((state) => state.address);
@@ -31,6 +31,89 @@ export const PlaceOrder = () => {
     setLoaded(true);
   }, []);
 
+  function generateRandomDeliveryRange() {
+    const minStart = 19;
+    const maxStart = 28;
+    const startDay = Math.floor(Math.random() * (maxStart - minStart + 1)) + minStart;
+    const endDay = startDay + 5;
+  
+    return { startDay, endDay };
+  };
+
+  const sendEmail = async (firstName: string, ordenID: string|undefined, orderDetails: any) => {
+    try {
+      // Extraer los detalles necesarios de la orden
+    const { items, address, subTotal, tax, total } = orderDetails;
+
+    // Generar el rango de entrega aleatorio
+    const deliveryRange = generateRandomDeliveryRange();
+    const { startDay, endDay } = deliveryRange;
+
+
+    // Construir los elementos HTML para los artículos
+    const itemsHtml = items.map((item: any) => `
+      <div style="margin-bottom: 15px;">
+      <div>
+            <p class="font-bold">${item.product.title} x ${item.quantity}</p>
+      </div>
+        <div key=${item.product.ProductImage[0].url}" style="margin-bottom: 10px;">
+          <img src="https://alexdy-pagina-web.vercel.app/_next/image?url=%2Fproducts%2F${item.product.ProductImage[0].url}&w=256&q=75" alt="${item.product.title}" width="100" height="100" style="margin-right: 10px;" />
+        </div>
+      </div>
+    `).join('');
+
+    // Construir el cuerpo del correo electrónico
+    const emailHtml = `
+      <div>
+        <h1>Hola, ${firstName}!</h1>
+        <p>Gracias por comprar en CodiCown Shop</p>
+        <h2>Resumen de tu compra</h2>
+        <div style="margin-bottom: 20px;">
+          <h3>Envío a domicilio</h3>
+          <p>${address.address} - ${address.address2}</p>
+          <p>${address.city}, ${address.country}</p>
+          <p>${address.firstName} ${address.lastName} - ${address.phone}</p>
+        </div>
+        <div>
+        <h3>Pagaste ${currencyFormat(total)}</h3>
+        <p>Vía Paypal</p>
+        </div>
+        <div>
+        <h3>Detalles de la orden</h3>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <h4>Productos</h4>
+          ${itemsHtml}
+        </div>
+        <div style="margin-bottom: 20px;">
+          <h3>Rango de entrega estimado</h3>
+          <p>Tu pedido llegará entre ${startDay} y ${endDay} días a partir de hoy.</p>
+        </div>
+        <a href="https://alexdy-pagina-web.vercel.app/orders/${ordenID}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 15px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 10px;">Más detalles</a>
+      </div>`;
+
+      const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: 'alex.dilan.2019@gmail.com',
+          subject: 'Tu compra está en camino',
+          html: emailHtml,
+        }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Al final deberia aparecer este');
+        console.log('Correo electrónico enviado:', result.message);
+      } else {
+        console.error('Error al enviar correo electrónico:', result.error);
+      }
+    } catch (error) {
+      console.error('Error al enviar correo electrónico:', error);
+    }
+  };
 
   const handleApprove = async () => {
 
@@ -53,7 +136,7 @@ export const PlaceOrder = () => {
       setErrorMessage(resp.message);
       return;
     }
-
+    
     console.log(resp.order?.id)
     console.log(address.firstName)
     
@@ -64,20 +147,15 @@ export const PlaceOrder = () => {
     setShowPayPalButtons(false);
 
     //enviar email-----------------------------
-    const respM = await fetch('/api/send', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstName: address.firstName,
-        ordenID: resp.order?.id
-      }),
-    })
-    const dataM = await respM.json();
-    console.log(dataM);
+    const { ok, order } = await getOrderById(resp.order?.id || "");
+    await sendEmail(address.firstName, resp.order?.id, {
+      items: order?.OrderItem,
+      address,
+      subTotal: order?.subTotal,
+      tax: order?.tax,
+      total: order?.total,
+    });
     //-----------------------------------------
-
 
     console.log("Ya prendio tu");
 
@@ -90,7 +168,6 @@ export const PlaceOrder = () => {
   };
 
   const handlePlaceOrderClick = async () => {
-
     setIsPlacingOrder(true);
     setShowPayPalButtons(true);
   };

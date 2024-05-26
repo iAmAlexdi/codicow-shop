@@ -33,10 +33,12 @@ export default async function ProfilePage() {
               <dt className="text-sm font-semibold text-gray-500">ID</dt>
               <dd className="text-sm text-gray-900">{session.user.id}</dd>
             </div>
+            {/*
             <div className="px-4 py-2">
               <dt className="text-sm font-semibold text-gray-500">Correo Verificado</dt>
               <dd className="text-sm text-gray-900">{session.user.emailVerified ? 'Si' : 'No'}</dd>
             </div>
+            */}
           </dl>
         </div>
       </div>
