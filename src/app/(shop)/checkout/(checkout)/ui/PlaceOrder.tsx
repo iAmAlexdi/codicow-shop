@@ -57,7 +57,7 @@ export const PlaceOrder = () => {
             <p class="font-bold">${item.product.title} x ${item.quantity}</p>
       </div>
         <div key=${item.product.ProductImage[0].url}" style="margin-bottom: 10px;">
-          <img src="https://alexdy-pagina-web.vercel.app/_next/image?url=%2Fproducts%2F${item.product.ProductImage[0].url}&w=256&q=75" alt="${item.product.title}" width="100" height="100" style="margin-right: 10px;" />
+          <img src="https://codicown-shop-online.vercel.app/_next/image?url=%2Fproducts%2F${item.product.ProductImage[0].url}&w=256&q=75" alt="${item.product.title}" width="100" height="100" style="margin-right: 10px;" />
         </div>
       </div>
     `).join('');
@@ -89,7 +89,7 @@ export const PlaceOrder = () => {
           <h3>Rango de entrega estimado</h3>
           <p>Tu pedido llegará entre ${startDay} y ${endDay} días a partir de hoy.</p>
         </div>
-        <a href="https://alexdy-pagina-web.vercel.app/orders/${ordenID}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 15px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 10px;">Más detalles</a>
+        <a href="https://codicown-shop-online.vercel.app/orders/${ordenID}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 15px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 10px;">Más detalles</a>
       </div>`;
 
       const response = await fetch('/api/send', {
@@ -98,7 +98,7 @@ export const PlaceOrder = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          to: 'alex.dilan.2019@gmail.com',
+          to: 'alex.dilan.2019@gmail.com',//email del usuario
           subject: 'Tu compra está en camino',
           html: emailHtml,
         }),
