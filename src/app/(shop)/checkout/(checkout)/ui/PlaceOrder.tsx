@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
+import { useSession } from 'next-auth/react';
+
 import { placeOrder} from '@/actions';
 import { useAddressStore, useCartStore } from "@/store";
 import { currencyFormat } from '@/utils';
@@ -18,6 +20,8 @@ export const PlaceOrder = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [showPayPalButtons, setShowPayPalButtons] = useState(false);
+
+  const { data: session } = useSession();
 
   const address = useAddressStore((state) => state.address);
 
@@ -75,11 +79,11 @@ export const PlaceOrder = () => {
           <p>${address.firstName} ${address.lastName} - ${address.phone}</p>
         </div>
         <div>
-        <h3>Pagaste ${currencyFormat(total)}</h3>
-        <p>Vía Paypal</p>
+          <h3>Pagaste ${currencyFormat(total)}</h3>
+          <p>Vía Paypal</p>
         </div>
         <div>
-        <h3>Detalles de la orden</h3>
+          <h3>Detalles de la orden</h3>
         </div>
         <div style="margin-bottom: 20px;">
           <h4>Productos</h4>
@@ -98,7 +102,7 @@ export const PlaceOrder = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          to: 'alex.dilan.2019@gmail.com',//email del usuario
+          to: session?.user?.email || 'alex.dilan.2019@gmail.com', // Email del usuario
           subject: 'Tu compra está en camino',
           html: emailHtml,
         }),
@@ -106,7 +110,7 @@ export const PlaceOrder = () => {
       const result = await response.json();
       if (response.ok) {
         console.log('Al final deberia aparecer este');
-        console.log('Correo electrónico enviado:', result.message);
+        console.log('', result.message);
       } else {
         console.error('Error al enviar correo electrónico:', result.error);
       }

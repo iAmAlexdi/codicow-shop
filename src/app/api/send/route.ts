@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       html,
     };
 
-    console.log(to)
+    console.log("El correo del cliente es: " + to);//Aqui se ve el correro
 
     await transporter.sendMail(mailOptions);
     console.log("luego aqui entra")
