@@ -17,6 +17,7 @@ import {
 import { useUIStore } from "@/store";
 import { logout } from "@/actions";
 
+
 export const Sidebar = () => {
   const isSideMenuOpen = useUIStore((state) => state.isSideMenuOpen);
   const closeMenu = useUIStore((state) => state.closeSideMenu);
@@ -24,6 +25,18 @@ export const Sidebar = () => {
   const { data: session } = useSession();
   const isAuthenticated = !!session?.user;
   const isAdmin = session?.user.role === "admin";
+
+  const handleLogout = async () => {
+    try {
+      // Llamar a la función de cierre de sesión
+      logout();
+
+      // Recargar la página inmediatamente
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   return (
     <div>
@@ -92,12 +105,12 @@ export const Sidebar = () => {
 
         {isAuthenticated && (
           <button
-            className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            onClick={() => logout()}
-          >
-            <IoLogOutOutline size={30} />
-            <span className="ml-3 text-xl">Salir</span>
-          </button>
+          className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
+          onClick={handleLogout}
+        >
+          <IoLogOutOutline size={30} />
+          <span className="ml-3 text-xl">Salir</span>
+        </button>
         )}
 
         {!isAuthenticated && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { QuantitySelector, SizeSelector } from "@/components";
 import type { CartProduct, Product, Size } from "@/interfaces";
@@ -17,6 +17,7 @@ export const AddToCart = ({ product }: Props) => {
   const [size, setSize] = useState<Size | undefined>();
   const [quantity, setQuantity] = useState<number>(1);
   const [posted, setPosted] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const addToCart = () => {
     setPosted(true);
@@ -37,9 +38,19 @@ export const AddToCart = ({ product }: Props) => {
     setPosted(false);
     setQuantity(1);
     setSize(undefined);
-
+    setShowSuccessMessage(true);
 
   };
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000); // Oculta el mensaje después de 3 segundos
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
 
 
   return (
@@ -48,6 +59,12 @@ export const AddToCart = ({ product }: Props) => {
         <span className="mt-2 text-red-500 fade-in">
           Debe de seleccionar una talla*
         </span>
+      )}
+      
+      {showSuccessMessage && (
+        <div className="mt-2 text-green-500 fade-in">
+          Producto agregado al carrito con éxito!
+        </div>
       )}
 
       {/* Selector de Tallas */}

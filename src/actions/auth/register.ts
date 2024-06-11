@@ -2,9 +2,23 @@
 
 import prisma from '@/lib/prisma';
 import bcryptjs from 'bcryptjs';
+import axios from 'axios';
 
-export const registerUser = async (name: string, email: string, password: string) => {
+const RECAPTCHA_SECRET_KEY = '6LeKqvYpAAAAAOxI8zQZ8RBLD8Gg3-1ReLsuPyUA';
+
+export const registerUser = async (name: string, email: string, password: string, recaptchaToken: string) => {
+  
   try {
+
+    // Verificar reCAPTCHA
+    const recaptchaResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+      params: {
+        secret: RECAPTCHA_SECRET_KEY,
+        response: recaptchaToken
+      }
+    });
+
+
     // Validar la contraseña
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$%#_*]).{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -15,7 +29,7 @@ export const registerUser = async (name: string, email: string, password: string
     }
 
     // Validar el correo electrónico
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com)$/;
     if (!emailRegex.test(email)) {
       return {
         ok: false,
