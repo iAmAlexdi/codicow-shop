@@ -1,41 +1,39 @@
 "use client";
 
-import { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
-
 import ReCAPTCHA from 'react-google-recaptcha';
-import React, { useState } from 'react';
-
 
 import { authenticate } from "@/actions";
 import { IoInformationOutline } from "react-icons/io5";
 import clsx from 'clsx';
-// import { useRouter } from 'next/navigation';
 
 export const LoginForm = () => {
-
-  const [recaptchaToken, setRecaptchaToken] = useState('');
-
-  // const router = useRouter();
+  const [recaptchaToken, setRecaptchaToken] = useState<string>('');
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [state, dispatch] = useFormState(authenticate, undefined);
-  
-  console.log(state);
 
   useEffect(() => {
-    if ( state === 'Success' ) {
-      // redireccionar
-      // router.replace('/');
+    if (state === 'Success') {
       window.location.replace('/');
     }
+  }, [state]);
 
-  },[state]);
+  useEffect(() => {
+    if (state === 'CredentialsSignin') {
+      // Reset recaptcha if login fails
+      setRecaptchaToken('');
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
+    }
+  }, [state]);
 
-  const handleSubmit = async ( e: React.FormEvent<HTMLFormElement> ) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     formData.append('recaptchaToken', recaptchaToken);
-
     dispatch(formData);
   };
 
@@ -49,17 +47,18 @@ export const LoginForm = () => {
         required
       />
 
-      <label htmlFor="email">Contraseña</label>
+      <label htmlFor="password">Contraseña</label>
       <input
         className="px-5 py-2 border bg-gray-200 rounded mb-5"
         type="password"
         name="password"
         required
       />
-      
+
       <ReCAPTCHA
         sitekey="6LeAAPYpAAAAALIYas0IzueP4x03Aa0Wr9mHVmZy"
         onChange={(token) => setRecaptchaToken(token || '')}
+        ref={recaptchaRef}
       />
 
       <div
