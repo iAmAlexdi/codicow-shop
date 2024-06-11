@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 
+import ReCAPTCHA from 'react-google-recaptcha';
+import React, { useState } from 'react';
+
+
 import { authenticate } from "@/actions";
 import { IoInformationOutline } from "react-icons/io5";
 import clsx from 'clsx';
@@ -11,6 +15,7 @@ import clsx from 'clsx';
 
 export const LoginForm = () => {
 
+  const [recaptchaToken, setRecaptchaToken] = useState('');
 
   // const router = useRouter();
   const [state, dispatch] = useFormState(authenticate, undefined);
@@ -26,15 +31,22 @@ export const LoginForm = () => {
 
   },[state]);
 
+  const handleSubmit = async ( e: React.FormEvent<HTMLFormElement> ) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    formData.append('recaptchaToken', recaptchaToken);
 
+    dispatch(formData);
+  };
 
   return (
-    <form action={dispatch} className="flex flex-col">
+    <form onSubmit={handleSubmit} className="flex flex-col">
       <label htmlFor="email">Correo electrónico</label>
       <input
         className="px-5 py-2 border bg-gray-200 rounded mb-5"
         type="email"
         name="email"
+        required
       />
 
       <label htmlFor="email">Contraseña</label>
@@ -42,6 +54,12 @@ export const LoginForm = () => {
         className="px-5 py-2 border bg-gray-200 rounded mb-5"
         type="password"
         name="password"
+        required
+      />
+      
+      <ReCAPTCHA
+        sitekey="6LeAAPYpAAAAALIYas0IzueP4x03Aa0Wr9mHVmZy"
+        onChange={(token) => setRecaptchaToken(token || '')}
       />
 
       <div
@@ -59,12 +77,7 @@ export const LoginForm = () => {
         )}
       </div>
 
-        <LoginButton />
-      {/* <button type="submit" className="btn-primary">
-        Ingresar
-      </button> */}
-
-      {/* divisor l ine */}
+      <LoginButton recaptchaToken={recaptchaToken} pending={useFormStatus().pending} />
       <div className="flex items-center my-5">
         <div className="flex-1 border-t border-gray-500"></div>
         <div className="px-2 text-gray-800">O</div>
@@ -78,18 +91,16 @@ export const LoginForm = () => {
   );
 };
 
-function LoginButton() {
-  const { pending } = useFormStatus();
-
+function LoginButton({ recaptchaToken, pending }: { recaptchaToken: string, pending: boolean }) {
   return (
     <button 
       type="submit" 
-      className={ clsx({
-        "btn-primary": !pending,
-        "btn-disabled": pending
+      className={clsx({
+        "btn-primary": !pending && recaptchaToken,
+        "btn-disabled": pending || !recaptchaToken
       })}
-      disabled={ pending }
-      >
+      disabled={pending || !recaptchaToken}
+    >
       Ingresar
     </button>
   );

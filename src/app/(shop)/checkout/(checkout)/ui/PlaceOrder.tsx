@@ -93,7 +93,7 @@ export const PlaceOrder = () => {
           <h3>Rango de entrega estimado</h3>
           <p>Tu pedido llegará entre ${startDay} y ${endDay} días a partir de hoy.</p>
         </div>
-        <a href="https://codicown-shop-online.vercel.app/orders/${ordenID}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 15px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 10px;">Más detalles</a>
+        <a href="https://codicown-shop-online.vercel.app/orders/${ordenID}" style="display: inline-block; background-color: #4CAF50; color: white; padding: 15px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 10px;">Ver en mis compras</a>
       </div>`;
 
       const response = await fetch('/api/send', {
