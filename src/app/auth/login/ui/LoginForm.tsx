@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import ReCAPTCHA from 'react-google-recaptcha';
-
 import { authenticate } from "@/actions";
 import { IoInformationOutline } from "react-icons/io5";
 import clsx from 'clsx';
@@ -13,6 +12,7 @@ export const LoginForm = () => {
   const [recaptchaToken, setRecaptchaToken] = useState<string>('');
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [state, dispatch] = useFormState(authenticate, undefined);
+  const [loginAttempts, setLoginAttempts] = useState<number>(0);
 
   useEffect(() => {
     if (state === 'Success') {
@@ -22,13 +22,19 @@ export const LoginForm = () => {
 
   useEffect(() => {
     if (state === 'CredentialsSignin') {
-      // Reset recaptcha if login fails
+      setLoginAttempts(prev => prev + 1);
       setRecaptchaToken('');
       if (recaptchaRef.current) {
         recaptchaRef.current.reset();
       }
     }
   }, [state]);
+
+  useEffect(() => {
+    if (loginAttempts >= 1) {
+      window.location.reload();
+    }
+  }, [loginAttempts]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
